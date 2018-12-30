@@ -340,7 +340,7 @@ proximity_fade_enable = false
 distance_fade_enable = false
 _sections_unfolded = [ "Albedo" ]
 
-[node name="Testing_Area" type="Spatial" index="0"]
+[node name="Testing_Area" type="Spatial"]
 
 [node name="Box" type="Spatial" parent="." index="0"]
 

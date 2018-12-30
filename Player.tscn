@@ -4074,7 +4074,7 @@ use_filter = true
 font_data = ExtResource( 9 )
 _sections_unfolded = [ "Extra Spacing", "Settings" ]
 
-[node name="Player" type="KinematicBody"]
+[node name="Player" type="KinematicBody" index="0"]
 
 input_ray_pickable = true
 input_capture_on_drag = false

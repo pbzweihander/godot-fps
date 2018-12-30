@@ -10,24 +10,24 @@ public class Player : KinematicBody
     private const float DEACCEL = 16f;
     private const float MAX_SLOPE_ANGLE = 2f * Mathf.Pi / 9f;
     private const float MOUSE_SENSITIVITY = 0.05f;
-
+    private const float MAX_SPRINT_SPEED = 30f;
+    private const float SPRINT_ACCEL = 18f;
 
     private Vector3 velocity;
     private Vector3 direction;
+    private bool isSprinting = false;
 
     private Camera camera;
     private Spatial rotationHelper;
+    private SpotLight flashlight;
 
     public override void _Ready()
     {
         camera = (Camera)GetNode("Rotation_Helper/Camera");
         rotationHelper = (Spatial)GetNode("Rotation_Helper");
+        flashlight = (SpotLight)GetNode("Rotation_Helper/Flashlight");
 
         Input.SetMouseMode(Input.MouseMode.Captured);
-    }
-
-    public override void _Process(float delta)
-    {
     }
 
     public override void _PhysicsProcess(float timeDelta)
@@ -70,6 +70,19 @@ public class Player : KinematicBody
             else
                 Input.SetMouseMode(Input.MouseMode.Visible);
         }
+
+        if (Input.IsActionPressed("movement_sprint"))
+            isSprinting = true;
+        else
+            isSprinting = false;
+
+        if (Input.IsActionJustPressed("flashlight"))
+        {
+            if (flashlight.IsVisibleInTree())
+                flashlight.Hide();
+            else
+                flashlight.Show();
+        }
     }
 
     private void process_movement(float timeDelta)
@@ -82,11 +95,20 @@ public class Player : KinematicBody
         var horizontalVelocity = velocity;
         horizontalVelocity.y = 0;
 
-        var target = direction * MAX_SPEED;
+        var target = direction;
+        if (isSprinting)
+            target *= MAX_SPRINT_SPEED;
+        else
+            target *= MAX_SPEED;
 
-        var accel = ACCEL;
-        if (direction.Dot(horizontalVelocity) == 0)
-            accel = DEACCEL;
+        var accel = DEACCEL;
+        if (direction.Dot(horizontalVelocity) > 0)
+        {
+            if (isSprinting)
+                accel = ACCEL;
+            else
+                accel = SPRINT_ACCEL;
+        }
 
         horizontalVelocity = horizontalVelocity.LinearInterpolate(target, accel * timeDelta);
         velocity.x = horizontalVelocity.x;
